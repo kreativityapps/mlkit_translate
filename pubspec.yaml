@@ -1,6 +1,6 @@
 name: mlkit_translate
 description: Translate text using Google ML Kit
-version: 1.0.0
+version: 1.0.0+1
 homepage: https://github.com/NickBalnaves/mlkit_translate
 
 environment:
