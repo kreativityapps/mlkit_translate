@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:flutter/material.dart';
 import 'package:mlkit_translate/mlkit_translate.dart';
 
@@ -24,8 +26,7 @@ class _MyAppState extends State<MyApp> {
                     text: 'hello',
                     target: 'es',
                   ),
-                  builder: (context, snapshot) =>
-                      Text(snapshot.data ?? 'Loading...'),
+                  builder: (context, snapshot) => Text(snapshot.data ?? 'Loading...'),
                 ),
                 RaisedButton(
                   child: Text('Preload Spanish'),

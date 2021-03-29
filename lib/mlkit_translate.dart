@@ -7,9 +7,9 @@ class MlkitTranslate {
   static const MethodChannel _channel = const MethodChannel('mlkit_translate');
 
   static Future<String> translateText({
-    @required String target,
-    @required String text,
-    String source,
+    required String target,
+    required String text,
+    required String source,
   }) async {
     try {
       return await _channel.invokeMethod(
