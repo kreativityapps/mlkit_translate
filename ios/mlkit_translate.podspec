@@ -17,7 +17,7 @@ A new flutter plugin project.
   s.static_framework = true
   s.dependency 'Flutter'
   s.dependency 'GoogleMLKit/Translate', "~> 1.0.0"
-  s.dependency 'GoogleMLKit/LanguageID', "~> 1.1.0"
+  s.dependency 'GoogleMLKit/LanguageID', "~> 1.0.0"
   s.platform = :ios, '10.0'
 
   # Flutter.framework does not contain a i386 slice.
