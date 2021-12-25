@@ -58,7 +58,8 @@ public class SwiftMlkitTranslatePlugin: NSObject, FlutterPlugin {
                 result("Success")
                 break;
 
-
+//             case: "closeLanguageTranslator":
+//                 break;
             default:
                 result(FlutterMethodNotImplemented);
             }

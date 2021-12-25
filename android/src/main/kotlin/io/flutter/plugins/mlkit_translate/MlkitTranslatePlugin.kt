@@ -28,9 +28,9 @@ class MlkitTranslatePlugin : FlutterPlugin, MethodCallHandler {
     }
 
     private fun translateText(result: Result, source: String, target: String,
-                              text: String){
+                              text: String) {
         val translator = Translation.getClient(Builder()
-                .setSourceLanguage(source!!)
+                .setSourceLanguage(source)
                 .setTargetLanguage(target)
                 .build())
         translator.downloadModelIfNeeded(
@@ -54,51 +54,86 @@ class MlkitTranslatePlugin : FlutterPlugin, MethodCallHandler {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "translate" -> {
-                var source: String? = call.argument("source")
+                val source: String? = call.argument("source")
                 val target: String = call.argument("target") ?: "en"
                 val text: String = call.argument("text") ?: ""
 
                 if (source == null) {
                     LanguageIdentification.getClient(
-                        LanguageIdentificationOptions.Builder()
-                            .setConfidenceThreshold(0.0f)
-                            .build()
+                            LanguageIdentificationOptions.Builder()
+                                    .setConfidenceThreshold(0.0f)
+                                    .build()
                     ).identifyLanguage(text)
-                        .addOnSuccessListener { languageCode ->
-                            if (languageCode != null) {
-                                translateText(result, languageCode, target, text)
-                            } else {
+                            .addOnSuccessListener { languageCode ->
+                                if (languageCode != null) {
+                                    translateText(result, languageCode, target, text)
+                                } else {
+                                    translateText(result, "en", target, text)
+                                }
+                            }
+                            .addOnFailureListener { exception ->
                                 translateText(result, "en", target, text)
                             }
-                        }
-                        .addOnFailureListener { exception ->
-                            translateText(result, "en", target, text)
-                        }
                 } else {
                     translateText(result, source, target, text)
                 }
             }
             "downloadModel" -> {
-                var model: String? = call.argument("model")
+                val model: String? = call.argument("model")
                 if (model != null) {
                     RemoteModelManager.getInstance().download(
-                        TranslateRemoteModel.Builder(model).build(),
-                        DownloadConditions.Builder()
-                            .build()
+                            TranslateRemoteModel.Builder(model).build(),
+                            DownloadConditions.Builder().requireWifi()
+                                    .build()
                     )
-                        .addOnSuccessListener {
-                            result.success("Success")
-                        }
-                        .addOnFailureListener { exception ->
-                            result.error(
-                                "downloadModelError",
-                                exception
-                                    .localizedMessage,
-                                null
-                            )
-                        }
+                            .addOnSuccessListener {
+                                result.success("Success")
+                            }
+                            .addOnFailureListener { exception ->
+                                result.error(
+                                        "downloadModelError",
+                                        exception
+                                                .localizedMessage,
+                                        null
+                                )
+                            }
                 }
             }
+            "getDownloadedModels" -> {
+                RemoteModelManager.getInstance().getDownloadedModels(TranslateRemoteModel::class.java)
+                        .addOnSuccessListener { models ->
+                            result.success(models.map { model -> model.language })
+                        }
+                        .addOnFailureListener {
+                            result.success(null)
+                        }
+            }
+            "deleteDownloadedModel" -> {
+                val model: String? = call.argument("model")
+                if (model != null) {
+                    RemoteModelManager.getInstance().deleteDownloadedModel(
+                            TranslateRemoteModel.Builder(model).build()
+                    ).addOnSuccessListener {
+                        result.success(true)
+                    }.addOnFailureListener {
+                        result.success(false)
+                    }
+                }
+            }
+//            "closeLanguageTranslator" -> {
+//                translator?.close()
+//                        .addOnSuccessListener {
+//                            result.success("Success")
+//                        }
+//                        .addOnFailureListener { exception ->
+//                            result.error(
+//                                    "closeLanguageTranslator",
+//                                    exception
+//                                            .localizedMessage,
+//                                    null
+//                            )
+//                        }
+//            }
             else -> {
                 result.notImplemented()
             }
