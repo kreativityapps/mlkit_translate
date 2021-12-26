@@ -16,7 +16,7 @@ public class SwiftMlkitTranslatePlugin: NSObject, FlutterPlugin {
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
 
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
             case "translate":
                 let args = call.arguments as? [String: Any]
@@ -57,7 +57,27 @@ public class SwiftMlkitTranslatePlugin: NSObject, FlutterPlugin {
                 }
                 result("Success")
                 break;
-
+            case "getDownloadedModels":
+                let localModels = ModelManager.modelManager().downloadedTranslateModels
+                result(localModels.map {
+                    $0.language
+                })
+            case "deleteDownloadedModel":
+                if let args = call.arguments as? [String: Any],
+                    let model = args["model"] as? String {
+                    ModelManager.modelManager().deleteDownloadedModel(TranslateRemoteModel.translateRemoteModel(
+                        language: TranslateLanguage.allLanguages().first(where: {$0.rawValue == model}) ?? .english
+                    ), completion: { error in
+                        guard error == nil else { return }})
+                } else {
+                    result(FlutterError(code: "-1", message: "iOS could not extract " +
+                        "flutter arguments in method: (downloadModel)", details: nil))
+                }
+                result("Success")
+                break;
+//                 getModelManager().deleteDownloadedModel(getTranslateRemoteModel(call)) { error in
+//                     result(error == nil)
+//                 }
 //             case: "closeLanguageTranslator":
 //                 break;
             default:
