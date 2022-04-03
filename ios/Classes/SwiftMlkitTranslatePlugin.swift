@@ -42,7 +42,7 @@ public class SwiftMlkitTranslatePlugin: NSObject, FlutterPlugin {
             case "downloadModel":
                 if let args = call.arguments as? [String: Any],
                     let model = args["model"] as? String {
-                    ModelManager.modelManager().download(
+                    ModelManager.modelManager().download    (
                         TranslateRemoteModel.translateRemoteModel(
                             language: TranslateLanguage.allLanguages().first(where: {$0.rawValue == model}) ?? .english
                         ),

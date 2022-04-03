@@ -53,6 +53,25 @@ class MlkitTranslatePlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
+            "detectLanguage" -> {
+                val text: String = call.argument("text") ?: ""
+
+                LanguageIdentification.getClient(
+                    LanguageIdentificationOptions.Builder()
+                        .setConfidenceThreshold(0.0f)
+                        .build()
+                ).identifyLanguage(text)
+                    .addOnSuccessListener { languageCode ->
+                        if (languageCode != null) {
+                            result.success(languageCode)
+                        } else {
+                            result.success("und")
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        result.success("und")
+                    }
+            }
             "translate" -> {
                 val source: String? = call.argument("source")
                 val target: String = call.argument("target") ?: "en"
@@ -83,7 +102,7 @@ class MlkitTranslatePlugin : FlutterPlugin, MethodCallHandler {
                 if (model != null) {
                     RemoteModelManager.getInstance().download(
                             TranslateRemoteModel.Builder(model).build(),
-                            DownloadConditions.Builder().requireWifi()
+                            DownloadConditions.Builder()
                                     .build()
                     )
                             .addOnSuccessListener {

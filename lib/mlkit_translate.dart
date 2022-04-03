@@ -6,6 +6,22 @@ import 'package:flutter/services.dart';
 class MlkitTranslate {
   static const MethodChannel _channel = const MethodChannel('mlkit_translate');
 
+  static Future<String> detectLanguage({
+    required String text,
+  }) async {
+    try {
+      return await _channel.invokeMethod(
+        'detectLanguage',
+        {
+          'text': text,
+        },
+      );
+    } on Exception catch (e) {
+      debugPrint('$e');
+      return text;
+    }
+  }
+
   static Future<String> translateText({
     required String target,
     required String text,
