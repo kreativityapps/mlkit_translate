@@ -18,6 +18,19 @@ public class SwiftMlkitTranslatePlugin: NSObject, FlutterPlugin {
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
+            case "detectLanguage":
+                    let args = call.arguments as? [String: Any]
+                    let text = args?["text"] as? String ?? ""
+
+                    LanguageIdentification.languageIdentification(options: LanguageIdentificationOptions(confidenceThreshold: 0.0)).identifyLanguage(for: text) { (languageCode, error) in
+                        if (error != nil) {
+                            result("und")
+                        } else {
+                            result(languageCode ?? "und")
+                        }
+                    }
+
+                    break;
             case "translate":
                 let args = call.arguments as? [String: Any]
                 let source = args?["source"] as? String
